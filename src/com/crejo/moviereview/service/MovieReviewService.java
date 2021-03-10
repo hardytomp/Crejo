@@ -12,6 +12,8 @@ public interface MovieReviewService {
 	
 	public  int addNewUser(String userName) throws AlreadyPresentException;
 	public int addNewMovie(String movieName,int yearOfRelease,List<String> genre) throws AlreadyPresentException;
-	public int addNewReview(String movieName,String UserName,int ratings) throws MultipleReviewsNotAllowedException, MovieNotFoundException, ReviewsNotAllowedForYetToBeReleasedMoviesException, UserNotPresentException; 
+	public int addNewReview(String movieName,String UserName,int ratings) throws MultipleReviewsNotAllowedException, MovieNotFoundException, ReviewsNotAllowedForYetToBeReleasedMoviesException, UserNotPresentException;
+	public String getUserEntitlements(String UserName);
+	public float getMovieRating(String movieName);
 	
 }

@@ -37,7 +37,7 @@ public class MovieReviewServiceImpl implements MovieReviewService{
 
 	@Override
 	public int addNewReview(String movieName, String userName, int ratings) throws MultipleReviewsNotAllowedException, MovieNotFoundException, ReviewsNotAllowedForYetToBeReleasedMoviesException, UserNotPresentException {
-		if(reviewDao.getReview(movieName)!= null && reviewDao.getReview(movieName).stream().anyMatch(review -> review.getReviewedUser().equals(userName))){
+		if(reviewDao.getReview(movieName)!= null && reviewDao.getReview(movieName).stream().anyMatch(review -> review.getReviewedUser().getName().equals(userName))){
 			throw new MultipleReviewsNotAllowedException("Multiple reviews not allowed !!This Movie" +movieName+" already reviewd by "+userName);
 		}
 		Movie reviewingMovie = movieDao.getMovie(movieName);
@@ -57,7 +57,7 @@ public class MovieReviewServiceImpl implements MovieReviewService{
 		UserType usetype = getUserType(reviewer);
 		reviewer.setNumberOfReviewsGiven(reviewer.getNumberOfReviewsGiven()+1);
 		userDao.updateUser(reviewer);
-		
+
 		return reviewDao.saveReview(new Review(reviewer, reviewingMovie, ratings*getWeitage(usetype)));
 	} 
 	
@@ -71,6 +71,19 @@ public class MovieReviewServiceImpl implements MovieReviewService{
 		if(type.equals(UserType.CRITIC))
 			return 2;
 		return 1;
+	}
+
+	@Override
+	public String getUserEntitlements(String userName) {
+		if(userDao.getUser(userName).getNumberOfReviewsGiven() > 3)
+			return UserType.CRITIC.getValue();
+		return UserType.VIEWER.getValue();
+	}
+
+	@Override
+	public float getMovieRating(String movieName) {
+		int noOfReviews = reviewDao.getReview(movieName).size();	
+		return reviewDao.getReview(movieName).stream().map(rvw->rvw.getRating()).reduce(0, (a,b)->a+b)/noOfReviews;
 	}
 	
 
